@@ -1,5 +1,7 @@
 # IconMemo · 图标记忆
 
+简体中文 | [English](README.en.md)
+
 > Windows 桌面图标布局保存 / 恢复工具 —— 免费开源，单文件，不依赖第三方运行库。
 
 ![License](https://img.shields.io/badge/license-MIT-green)
