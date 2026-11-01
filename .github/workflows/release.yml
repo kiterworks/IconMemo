@@ -13,6 +13,8 @@ jobs:
   build-and-release:
     name: 打包并发布
     runs-on: windows-latest
+    env:
+      PYTHONIOENCODING: utf-8
     steps:
       - name: 检出代码
         uses: actions/checkout@v4

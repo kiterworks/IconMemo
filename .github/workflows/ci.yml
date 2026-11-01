@@ -10,6 +10,8 @@ jobs:
   checks:
     name: 语法 / 冒烟 / 合规
     runs-on: windows-latest
+    env:
+      PYTHONIOENCODING: utf-8
     steps:
       - name: 检出代码
         uses: actions/checkout@v4

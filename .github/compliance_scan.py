@@ -12,6 +12,11 @@ import os
 import re
 import sys
 
+# GitHub 的 Windows runner 控制台默认 cp1252，直接 print 中文会抛 UnicodeEncodeError
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 FORBIDDEN = [
     (r"DeskSave", "竞品名"),
     (r"Blauhut", "原版作者名"),
