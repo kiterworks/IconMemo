@@ -1,0 +1,89 @@
+name: Release
+
+# 推送 v* 标签时自动：语法检查 → 冒烟测试 → 合规扫描 → 打包两个 exe → 压缩 → 生成校验和 → 发布 Release
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: 打包并发布
+    runs-on: windows-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: 安装打包工具
+        run: python -m pip install pyinstaller
+
+      - name: 语法检查
+        run: |
+          python -m py_compile iconmemo.py
+          python -m py_compile iconmemo_gui.py
+
+      - name: 冒烟测试
+        run: python .github/smoke_test.py
+
+      - name: 合规扫描
+        run: python .github/compliance_scan.py
+
+      - name: 打包图形版（IconMemo.exe）
+        run: >
+          python -m PyInstaller --noconfirm --clean --onefile --noconsole
+          --icon icon.ico --name IconMemo iconmemo_gui.py
+
+      - name: 打包命令行版（IconMemoCLI.exe）
+        run: >
+          python -m PyInstaller --noconfirm --clean --onefile --console
+          --icon icon.ico --name IconMemoCLI iconmemo.py
+
+      - name: 组装发布物
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          New-Item -ItemType Directory -Force -Path "dist/package" | Out-Null
+          Copy-Item "dist/IconMemo.exe"      "dist/package/"
+          Copy-Item "dist/IconMemoCLI.exe"   "dist/package/"
+          Copy-Item "README.md"              "dist/package/"
+          Copy-Item "CHANGELOG.md"           "dist/package/"
+          Copy-Item "LICENSE"                "dist/package/"
+          Compress-Archive -Path "dist/package/*" -DestinationPath "dist/IconMemo_${tag}_win64.zip"
+          Write-Host "已生成 dist/IconMemo_${tag}_win64.zip"
+
+      - name: 生成 SHA256 校验和
+        shell: pwsh
+        run: |
+          $tag  = $env:GITHUB_REF_NAME
+          $files = @(
+            "dist/IconMemo.exe",
+            "dist/IconMemoCLI.exe",
+            "dist/IconMemo_${tag}_win64.zip"
+          )
+          $lines = foreach ($f in $files) {
+            $hash = (Get-FileHash $f -Algorithm SHA256).Hash.ToLower()
+            "{0}  {1}" -f $hash, (Split-Path $f -Leaf)
+          }
+          $lines | Set-Content -Encoding utf8 "dist/SHA256SUMS.txt"
+          Get-Content "dist/SHA256SUMS.txt"
+
+      - name: 发布 Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          gh release create "$tag" `
+            --title "IconMemo $tag" `
+            --generate-notes `
+            "dist/IconMemo.exe" `
+            "dist/IconMemoCLI.exe" `
+            "dist/IconMemo_${tag}_win64.zip" `
+            "dist/SHA256SUMS.txt"

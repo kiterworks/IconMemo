@@ -2,11 +2,35 @@
 
 > Windows 桌面图标布局保存 / 恢复工具 —— 免费开源，单文件，不依赖第三方运行库。
 
+![License](https://img.shields.io/badge/license-MIT-green)
+![Release](https://img.shields.io/github/v/release/kiterworks/IconMemo)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20x64-blue)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+
 插拔外接显示器、切换分辨率、调整缩放比例、误触「自动排列图标」之后，
 桌面图标往往会重新排布，而 Windows 并不提供「撤销」。
 IconMemo 把你排好的图标位置存下来，之后随时一键还原。
 
 ![界面总览](docs/screenshots/01_界面总览.png)
+
+---
+
+## 下载
+
+**免安装、免 Python，下载后双击即用。**
+
+| 文件 | 说明 |
+|---|---|
+| [`IconMemo_v1.0.0_win64.zip`](https://github.com/kiterworks/IconMemo/releases/download/v1.0.0/IconMemo_v1.0.0_win64.zip) | **推荐**。含图形版 + 命令行版 + 说明文档 |
+| [`IconMemo.exe`](https://github.com/kiterworks/IconMemo/releases/download/v1.0.0/IconMemo.exe) | 只要图形界面（8.3 MB） |
+| [`IconMemoCLI.exe`](https://github.com/kiterworks/IconMemo/releases/download/v1.0.0/IconMemoCLI.exe) | 只要命令行（8.2 MB） |
+| [`SHA256SUMS.txt`](https://github.com/kiterworks/IconMemo/releases/download/v1.0.0/SHA256SUMS.txt) | SHA256 校验和，可用于核对文件完整性 |
+
+系统要求：**Windows 10 / 11（64 位）**。全部历史版本见
+[Releases](https://github.com/kiterworks/IconMemo/releases)。
+
+> exe 未做代码签名。若杀毒软件提示风险，属未签名程序的常见误报，添加信任即可
+> （校验和见 `SHA256SUMS.txt`，可用 `certutil -hashfile 文件名 SHA256` 核对）。
 
 ---
 
@@ -45,10 +69,18 @@ Windows 桌面图标的位置会在这几种情况下被打乱，而且系统没
 
 ## 快速开始
 
-### 方式一：直接用（需要 Python 3.9+）
+### 方式一：下载 exe（推荐，免装 Python）
+
+从 [Releases](https://github.com/kiterworks/IconMemo/releases) 下载
+`IconMemo_v1.0.0_win64.zip`，解压后：
+
+- 双击 `图标记忆.bat` 或 `IconMemo.exe` 打开图形界面
+- 或在命令行使用 `IconMemoCLI.exe`（用法见下文「命令行」一节）
+
+### 方式二：源码运行（需要 Python 3.9+）
 
 ```bash
-git clone https://github.com/<your-name>/IconMemo.git
+git clone https://github.com/kiterworks/IconMemo.git
 cd IconMemo
 
 # 图形界面（会启动一个仅监听 127.0.0.1 的本地服务，并用默认浏览器打开）
@@ -59,7 +91,7 @@ python iconmemo.py save            # 保存当前主布局
 python iconmemo.py restore         # 恢复主布局
 ```
 
-### 方式二：自己打包成单文件 exe
+### 方式三：自己打包成单文件 exe
 
 ```bash
 pip install pyinstaller
@@ -154,6 +186,15 @@ FindWindow("Progman")
 
 **Q：会联网吗？**
 不会。程序运行时不需要网络连接，所有数据保存在本地。
+
+**Q：exe 版和源码版有什么区别？**
+功能完全一样，都来自同一份代码。exe 版免装 Python、双击即用；源码版需要 Python 3.9+，
+但可以直接改代码、看实现。想省事选 exe，想折腾选源码。
+
+**Q：杀毒软件报毒怎么办？**
+exe 未做代码签名，属未签名程序的常见误报。可先核对
+[SHA256SUMS.txt](https://github.com/kiterworks/IconMemo/releases) 里的校验和
+（`certutil -hashfile IconMemo.exe SHA256`），确认一致后添加信任即可。
 
 **Q：会改我的文件吗？**
 只读取桌面图标的名称与坐标。导入其它工具的布局档案时也是只读，不会修改、移动或删除既有文件。

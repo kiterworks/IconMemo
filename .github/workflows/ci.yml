@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  checks:
+    name: 语法 / 冒烟 / 合规
+    runs-on: windows-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: 语法检查
+        run: |
+          python -m py_compile iconmemo.py
+          python -m py_compile iconmemo_gui.py
+          Write-Host "语法检查通过"
+
+      - name: 冒烟测试（引擎导入 + .dsv 解析）
+        run: python .github/smoke_test.py
+
+      - name: 合规扫描（竞品名 / 隐私信息）
+        run: python .github/compliance_scan.py
