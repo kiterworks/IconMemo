@@ -1,0 +1,15 @@
+# 统一换行符，避免 Windows / macOS / Linux 之间产生无意义的 diff
+* text=auto eol=lf
+
+# 二进制文件不做换行符转换
+*.png binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.exe binary
+*.dll binary
+
+# 文档保持原样
+*.md text eol=lf
+*.py text eol=lf
